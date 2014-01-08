@@ -8,13 +8,7 @@
 
 #import <CoreData/CoreData.h>
 
-@protocol NSManagedObjectContextHolder <NSObject>
-- (NSManagedObjectContext *)managedObjectContext;
-@end
-
 @interface NSManagedObjectContext (Helpers)
-
-+ (NSManagedObjectContext*)fromAppDelegate;
 
 //descriptor and predicate can be nil, limit can be 0 (no limit)
 - (NSArray *)fetchObjectsForEntityName:(NSString *)entityName

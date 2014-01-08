@@ -12,78 +12,76 @@
 
 @implementation NSManagedObject (Helpers)
 
-+ (NSManagedObjectContext*)setupContext:(NSManagedObjectContext *)context
-{
-    if (!context)
-        context = [NSManagedObjectContext fromAppDelegate];
-    return context;
-}
-
-+ (NSEntityDescription*)setupEntity:(NSString*)entityName
++ (NSEntityDescription*)setupEntity:(id)entityNameOrClass
                         withContext:(NSManagedObjectContext*)context;
 {
-    return [NSEntityDescription
-            entityForName:
-            entityName?
-            entityName:
-            NSStringFromClass([self class])
-            inManagedObjectContext:context];
+    if(class_isMetaClass(object_getClass(entityNameOrClass)))
+        // if class
+        return [NSEntityDescription
+                entityForName:NSStringFromClass(entityNameOrClass)
+                inManagedObjectContext:context];
+    else if([entityNameOrClass isKindOfClass:[NSString class]])
+        return [NSEntityDescription
+                entityForName:entityNameOrClass
+                inManagedObjectContext:context];
+    else
+        return
+        [NSEntityDescription
+         entityForName:NSStringFromClass([self class])
+         inManagedObjectContext:context];
 }
 
 + (id)temporaryObjectWithContext:(NSManagedObjectContext *)context
-                          entity:(NSString *)entityName
+                          entity:(id)entityNameOrClass
 {
-    context = [NSManagedObject setupContext:context];
-    NSEntityDescription *entity = [NSManagedObject
-                                   setupEntity:entityName
+    NSEntityDescription *entity = [self
+                                   setupEntity:entityNameOrClass
                                    withContext:context];
     
-    return [[NSManagedObject alloc]
+    return [[[self class] alloc]
             initWithEntity:entity
             insertIntoManagedObjectContext:nil];
 }
 
 - (id)temporaryObjectWithContext:(NSManagedObjectContext *)context
-                          entity:(NSString *)entityName
+                          entity:(id)entityNameOrClass
 {
-    context = [NSManagedObject setupContext:context];
-    NSEntityDescription *entity = [NSManagedObject
-                                   setupEntity:entityName
+    NSEntityDescription *entity = [[self class]
+                                   setupEntity:entityNameOrClass
                                    withContext:context];
     
-    NSManagedObject *obj = [[NSManagedObject alloc]
+    NSManagedObject *obj = [[[self class] alloc]
                             initWithEntity:entity
                             insertIntoManagedObjectContext:nil];
     
     [obj setValuesForKeysWithDictionary:
      [self dictionaryWithValuesForKeys:
       [entity attributesByName].allKeys]];
-
+    
     return obj;
 }
 
 - (id)insertToContext:(NSManagedObjectContext*)context
 {
-    context = [NSManagedObject setupContext:context];
     [context insertObject:self];
     return self;
 }
 
 + (id)newObjectWithContext:(NSManagedObjectContext *)context
-                    entity:(NSString*)entityName
+                    entity:(id)entityNameOrClass
 {
     return [[self
-            temporaryObjectWithContext:context
-            entity:entityName]
+             temporaryObjectWithContext:context
+             entity:entityNameOrClass]
             insertToContext:context];
 }
 
 - (id)newObjectWithContext:(NSManagedObjectContext *)context
-                    entity:(NSString*)entityName
+                    entity:(id)entityNameOrClass
 {
     return [[self
              temporaryObjectWithContext:context
-             entity:entityName]
+             entity:entityNameOrClass]
             insertToContext:context];
 }
 

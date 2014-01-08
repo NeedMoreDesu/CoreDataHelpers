@@ -11,19 +11,18 @@
 
 @interface NSManagedObject (Helpers)
 
-// if context is nil, will call managedObjectContext in AppDelegate
-// if entityName is nil, will try to use current class name as entity name
+// if entityNameOrClass is nil, will try to use current class name as entity name
 
 + (id)temporaryObjectWithContext:(NSManagedObjectContext *)context
-                          entity:(NSString*)entityName;
+                          entity:(id)entityNameOrClass;
 - (id)temporaryObjectWithContext:(NSManagedObjectContext *)context
-                          entity:(NSString*)entityName;
+                          entity:(id)entityNameOrClass;
 
 - (id)insertToContext:(NSManagedObjectContext*)context;
 
 + (id)newObjectWithContext:(NSManagedObjectContext *)context
-                    entity:(NSString*)entityName;
+                    entity:(id)entityNameOrClass;
 - (id)newObjectWithContext:(NSManagedObjectContext *)context
-                    entity:(NSString*)entityName;
+                    entity:(id)entityNameOrClass;
 
 @end
